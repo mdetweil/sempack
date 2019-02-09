@@ -15,6 +15,7 @@ namespace sempack
     {
     	private string[] _args;
     	private static Logger _log;
+    	private const string _command = "dotnet pack";
 
     	public Sempack(string[] args)
     	{
@@ -34,16 +35,25 @@ namespace sempack
     	private void BuildLoggingConfiguration(bool verbose)
     	{
         	var config = new LoggingConfiguration();
+        	var layoutString = string.Empty;
+        	if(verbose)
+        	{
+        		layoutString = @"${date:format=HH\:mm\:ss} VERBOSE ${message} ${exception}";
+        	}
+        	else 
+        	{
+        		layoutString = @"${date:format=HH\:mm\:ss} ${level} ${message} ${exception}";
+        	}
 
 	        var consoleTarget = new ConsoleTarget("target1")
 	        {
-	            Layout = @"${date:format=HH\:mm\:ss} ${level} ${message} ${exception}"
+	            Layout = layoutString
 	        };
 	        config.AddTarget(consoleTarget);
 
 	        if(verbose)
 	        {
-	        	config.AddRuleForOneLevel(LogLevel.Trace, consoleTarget); // only errors to file
+	        	config.AddRuleForAllLevels(consoleTarget); // only errors to file
 	        }
 	        else 
 	        {
@@ -52,7 +62,7 @@ namespace sempack
 
     	    LogManager.Configuration = config;
     	    _log = LogManager.GetCurrentClassLogger();
-    	    _log.Trace("Trace Logging Enabled");
+    	    _log.Trace("VERBOSE Logging Enabled");
     	}
 
     	private void RunOptionsAndReturnExitCode(Options options)
@@ -60,7 +70,28 @@ namespace sempack
     		BuildLoggingConfiguration(options.Verbose);
     		_log.Trace("Handling Valid Options");
     		var builder = new CommandBuilder(options);
-    		var commandString = builder.BuildPassThroughCommandString();
+    		
+    		string result = string.Empty;
+
+    		if(!builder.TryBuildCommandString(out result))
+    		{
+    			_log.Error($"Invalid Arguments: {result}");
+    		}
+
+    		//TODO: BUILD CSPROJ MODIFIER
+
+    		var runner = new CommandRunner(_command, result);
+    		
+    		if(!runner.TryRunCommand(out result))
+    		{
+    			_log.Error($"COMMAND FAILED: {result}");	
+    		}
+    		else 
+    		{
+    			_log.Trace($"Successful Command: {result}");
+    		}
+
+    		//TODO: RESET CSPROJ TO ORIGINAL STATE
     	}
 
 

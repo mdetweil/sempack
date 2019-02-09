@@ -53,14 +53,10 @@ namespace sempack
 			HelpText = "Defines the value for the $(VersionSuffix) MSBuild property in the project.")]
 		public string VersionSuffix {get; set;}
 
-		private static readonly Logger _log = LogManager.GetCurrentClassLogger();
-
 		public Options()
 		{
 
 		}
-
-
 	}
 
 }
