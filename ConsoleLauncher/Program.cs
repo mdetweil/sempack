@@ -1,4 +1,5 @@
 ﻿using System;
+using sempack;
 
 namespace ConsoleLauncher
 {
@@ -6,7 +7,8 @@ namespace ConsoleLauncher
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var sempack = new Sempack(args);
+           
         }
     }
 }
