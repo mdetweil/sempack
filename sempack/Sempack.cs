@@ -1,5 +1,4 @@
 ﻿using CommandLine;
-using Newtonsoft.Json;
 using NLog;
 using NLog.Targets;
 using NLog.Config;
@@ -79,7 +78,14 @@ namespace sempack
     			return;
     		}
 
-    		//TODO: BUILD CSPROJ MODIFIER
+    		var projModifier = new CsProjModifier(builder.GetPath(), options.Major, options.Minor);
+    		if(!projModifier.TryModifyProjectFile())
+    		{
+    			_log.Error($"Failed to modify {options.SourceFile} exiting application");
+    			return;
+    		}
+
+    		return;
 
     		var runner = new CommandRunner(_command, result);
     		
@@ -91,8 +97,6 @@ namespace sempack
     		{
     			_log.Trace($"Successful Command: {result}");
     		}
-
-    		//TODO: RESET CSPROJ TO ORIGINAL STATE
     	}
 
 

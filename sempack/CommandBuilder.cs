@@ -10,6 +10,7 @@ namespace sempack
 		private readonly Logger _log;
 		private readonly Options _options;
 		private StringBuilder _command;
+		private string _path;
 
 		public CommandBuilder(Options options)
 		{
@@ -33,15 +34,20 @@ namespace sempack
 			}
 		}
 
+		public string GetPath()
+		{
+			return _path;
+		}
+
 		private bool ValidateArgs(out string result)
 		{
 			result = string.Empty;
 			var currentDirectory = Directory.GetCurrentDirectory();
-			var path = Path.Combine(currentDirectory, _options.SourceFile);
+			_path = Path.Combine(currentDirectory, _options.SourceFile);
 
-			if (File.Exists(path))
+			if (File.Exists(_path))
 			{
-				result = path;
+				result = _path;
 				return true;
 			}
 			result = $"Unable to locate project file: {_options.SourceFile}";
