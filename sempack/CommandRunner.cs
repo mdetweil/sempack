@@ -9,17 +9,16 @@ namespace sempack
 	public class CommandRunner
 	{
 		private Logger _log;
-		private string _command;
 		private string _commandArg;
 
 		private ProcessStartInfo _processStartInfo;
 		private StringBuilder _processOutput;
 		private Process _process;
 
+
 		public CommandRunner(string command, string arg)
 		{
-			_command = command;
-			_commandArg = arg;
+			_commandArg = $"{command} {arg}";
 			_log = LogManager.GetCurrentClassLogger();
 			_processOutput = new StringBuilder();
 
@@ -29,7 +28,7 @@ namespace sempack
 
 		public bool TryRunCommand(out string result)
 		{
-			_log.Trace($"Running Command {_command} with args {_commandArg}");
+			_log.Trace($"Running Command {_commandArg}");
 			_process.Start();
 			_process.BeginOutputReadLine();
 			_process.BeginErrorReadLine();
@@ -55,8 +54,18 @@ namespace sempack
 			_processStartInfo.RedirectStandardInput = true;
 			_processStartInfo.RedirectStandardError = true;
 			_processStartInfo.UseShellExecute = false;
-			_processStartInfo.Arguments = _commandArg;
-			_processStartInfo.FileName = _command;
+			_processStartInfo.Arguments = $"-c \"{_commandArg}\"";
+
+			if(OperatingSystem.IsWindows())
+			{
+				_log.Trace("Running process from cmd.exe");
+				_processStartInfo.FileName = "cmd.exe";
+			}
+			else 
+			{
+				_log.Trace("Running process from bash");
+				_processStartInfo.FileName = "/bin/bash";
+			}
 		}
 
 		private void BuildProcess()

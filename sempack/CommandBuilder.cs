@@ -1,5 +1,6 @@
 using NLog;
 using System;
+using System.IO;
 using System.Text;
 
 namespace sempack
@@ -35,14 +36,23 @@ namespace sempack
 		private bool ValidateArgs(out string result)
 		{
 			result = string.Empty;
-			//return false;
-			throw new NotImplementedException();
+			var currentDirectory = Directory.GetCurrentDirectory();
+			var path = Path.Combine(currentDirectory, _options.SourceFile);
+
+			if (File.Exists(path))
+			{
+				result = path;
+				return true;
+			}
+			result = $"Unable to locate project file: {_options.SourceFile}";
+			return false;
 		}
 
 		private string BuildPassThroughCommandString()
 		{
 			_log.Trace("Building pass through command string.");
 			
+			SetProjectFile();
 			SetConfiguration();
 			SetIncludeSource();
 			SetIncludeSymbols();
@@ -53,6 +63,11 @@ namespace sempack
 			SetVersionSuffix();
 
 			return _command.ToString();
+		}
+
+		private void SetProjectFile()
+		{
+			_command.Append($"{_options.SourceFile}");
 		}
 
 		private void SetConfiguration()

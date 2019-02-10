@@ -76,6 +76,7 @@ namespace sempack
     		if(!builder.TryBuildCommandString(out result))
     		{
     			_log.Error($"Invalid Arguments: {result}");
+    			return;
     		}
 
     		//TODO: BUILD CSPROJ MODIFIER

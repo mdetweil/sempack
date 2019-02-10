@@ -53,6 +53,21 @@ namespace sempack
 			HelpText = "Defines the value for the $(VersionSuffix) MSBuild property in the project.")]
 		public string VersionSuffix {get; set;}
 
+		[Option('m', "major",
+			Required = false,
+			HelpText = "Specifies whether to permanetely increase the major build version by one.")]
+		public bool Major {get; set;}
+
+		[Option('n', "minor",
+		    Required = false,
+		    HelpText = "Specifies whether to permanetely increase the minor build version by one.")]
+		public bool Minor {get; set;}
+
+		[Option('f', "source-file",
+			Required = true,
+			HelpText = "Specifies the csproj file to auto-increment version on.")]
+		public string SourceFile {get; set;}
+
 		public Options()
 		{
 
