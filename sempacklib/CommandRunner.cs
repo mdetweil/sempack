@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Text;
 
 
-namespace sempack
+namespace sempacklib
 {
 	public class CommandRunner
 	{

@@ -3,7 +3,7 @@ using NLog;
 using System;
 using System.Text;
 
-namespace sempack
+namespace sempacklib
 {
 	public class Options
 	{

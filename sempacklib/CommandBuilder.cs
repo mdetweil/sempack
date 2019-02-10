@@ -3,7 +3,7 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace sempack
+namespace sempacklib
 {
 	public class CommandBuilder
 	{

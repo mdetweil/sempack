@@ -5,7 +5,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace sempack
+namespace sempacklib
 {
 
 	public class CsProjModifier

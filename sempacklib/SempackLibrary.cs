@@ -8,15 +8,15 @@ using System.Diagnostics;
 using System.Text;
 
 
-namespace sempack
+namespace sempacklib
 {
-    public class Sempack
+    public class SempackLibrary
     {
     	private string[] _args;
     	private static Logger _log;
     	private const string _command = "dotnet pack";
 
-    	public Sempack(string[] args)
+    	public SempackLibrary(string[] args)
     	{
     		_args = args;
     		ParseArguments();
@@ -84,8 +84,6 @@ namespace sempack
     			_log.Error($"Failed to modify {options.SourceFile} exiting application");
     			return;
     		}
-
-    		return;
 
     		var runner = new CommandRunner(_command, result);
     		
