@@ -5,11 +5,12 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <PackageId>sempack</PackageId>
-    <Version>0.1.0.0</Version>
+    <Version>0.2.0.0</Version>
     <Authors>mdetweil;</Authors>
     <Description>Updates the version automatically</Description>
     <RepositoryUrl>https://github.com/mdetweil/sempack</RepositoryUrl>
     <Copyright>2019</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>sempack</ToolCommandName>
