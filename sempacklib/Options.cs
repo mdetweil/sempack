@@ -3,7 +3,7 @@ using NLog;
 using System;
 using System.Text;
 
-namespace sempack
+namespace sempacklib
 {
 	public class Options
 	{
@@ -53,15 +53,25 @@ namespace sempack
 			HelpText = "Defines the value for the $(VersionSuffix) MSBuild property in the project.")]
 		public string VersionSuffix {get; set;}
 
-		[Option('m', "major",
+		[Option("major",
 			Required = false,
 			HelpText = "Specifies whether to permanetely increase the major build version by one.")]
 		public bool Major {get; set;}
 
-		[Option('n', "minor",
+		[Option("minor",
 		    Required = false,
 		    HelpText = "Specifies whether to permanetely increase the minor build version by one.")]
 		public bool Minor {get; set;}
+
+		[Option("build-version",
+		    Required = false,
+		    HelpText = "Specifies whether to permanetely increase the build version by one.")]
+		public bool Build {get; set;}
+
+		[Option("revision",
+		    Required = false,
+		    HelpText = "Specifies whether to permanetely increase the revision version by one.")]
+		public bool Revision {get; set;}
 
 		[Option('f', "source-file",
 			Required = true,

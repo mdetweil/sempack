@@ -1,13 +1,13 @@
 ﻿using System;
-using sempack;
+using sempacklib;
 
-namespace ConsoleLauncher
+namespace sempack
 {
     class Program
     {
         static void Main(string[] args)
         {
-            var sempack = new Sempack(args);
+            var sempack = new SempackLibrary(args);
            
         }
     }

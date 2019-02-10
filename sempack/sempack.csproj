@@ -1,13 +1,18 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <PackageReference Include="CommandLineParser" Version="2.4.3" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
-    <PackageReference Include="NLog" Version="4.5.11" />
+    <ProjectReference Include="..\sempacklib\sempacklib.csproj" />
   </ItemGroup>
-
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <PackageId>sempack</PackageId>
+    <Version>0.1.0.0</Version>
+    <Authors>mdetweil;</Authors>
+    <Description>Updates the version automatically</Description>
+    <RepositoryUrl>https://github.com/mdetweil/sempack</RepositoryUrl>
+    <Copyright>2019</Copyright>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>sempack</ToolCommandName>
+    <PackageOutputPath>./nupkg</PackageOutputPath>
+  </PropertyGroup>
 </Project>

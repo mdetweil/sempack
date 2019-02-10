@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace sempack
+namespace sempacklib
 {
 	public static class OperatingSystem
 	{

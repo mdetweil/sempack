@@ -1,5 +1,4 @@
 ﻿using CommandLine;
-using Newtonsoft.Json;
 using NLog;
 using NLog.Targets;
 using NLog.Config;
@@ -9,15 +8,15 @@ using System.Diagnostics;
 using System.Text;
 
 
-namespace sempack
+namespace sempacklib
 {
-    public class Sempack
+    public class SempackLibrary
     {
     	private string[] _args;
     	private static Logger _log;
     	private const string _command = "dotnet pack";
 
-    	public Sempack(string[] args)
+    	public SempackLibrary(string[] args)
     	{
     		_args = args;
     		ParseArguments();
@@ -79,7 +78,12 @@ namespace sempack
     			return;
     		}
 
-    		//TODO: BUILD CSPROJ MODIFIER
+    		var projModifier = new CsProjModifier(builder.GetPath(), options);
+    		if(!projModifier.TryModifyProjectFile())
+    		{
+    			_log.Error($"Failed to modify {options.SourceFile} exiting application");
+    			return;
+    		}
 
     		var runner = new CommandRunner(_command, result);
     		
@@ -91,8 +95,6 @@ namespace sempack
     		{
     			_log.Trace($"Successful Command: {result}");
     		}
-
-    		//TODO: RESET CSPROJ TO ORIGINAL STATE
     	}
 
 
