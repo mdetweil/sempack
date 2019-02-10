@@ -78,7 +78,7 @@ namespace sempacklib
     			return;
     		}
 
-    		var projModifier = new CsProjModifier(builder.GetPath(), options.Major, options.Minor);
+    		var projModifier = new CsProjModifier(builder.GetPath(), options);
     		if(!projModifier.TryModifyProjectFile())
     		{
     			_log.Error($"Failed to modify {options.SourceFile} exiting application");

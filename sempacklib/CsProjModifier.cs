@@ -14,13 +14,17 @@ namespace sempacklib
 		private readonly Logger _log;
 		private bool _incrementMajor;
 		private bool _incrementMinor;
+		private bool _incrementBuild;
+		private bool _incrementRevision;
 
-		public CsProjModifier(string projPath, bool incrementMajor, bool incrementMinor)
+		public CsProjModifier(string projPath, Options options)
 		{
 			_projPath = projPath;
 			_log = LogManager.GetCurrentClassLogger();
-			_incrementMajor = incrementMajor;
-			_incrementMinor = incrementMinor;
+			_incrementMajor = options.Major;
+			_incrementMinor = options.Minor;
+			_incrementBuild = options.Build;
+			_incrementRevision = options.Revision;
 		}
 
 		public bool TryModifyProjectFile()
@@ -59,7 +63,7 @@ namespace sempacklib
 			var majorVersion = 1;
 			var minorVersion = 0;
 			var buildVersion = GetBuildVersion();
-			var revision = GetBuildRevision();
+			var revisionVersion = GetBuildRevision();
 			if (!string.IsNullOrEmpty(currentVersion))
 			{
 				_log.Trace($"Current Version Value is: {currentVersion}");
@@ -72,6 +76,7 @@ namespace sempacklib
 						case 0:
 							if (int.TryParse(splitVersion[i], out int major))
 							{
+								majorVersion = major;
 								if(_incrementMajor)
 								{
 									_log.Trace("Incrementing Major");
@@ -83,6 +88,7 @@ namespace sempacklib
 						case 1:
 							if (int.TryParse(splitVersion[i], out int minor))
 							{
+								minorVersion = minor;
 								if(_incrementMinor)
 								{
 									_log.Trace("Incrementing Minor");
@@ -90,25 +96,42 @@ namespace sempacklib
 								}
 							}
 							break;
-						default:
+						case 2:
+							if (int.TryParse(splitVersion[i], out int build))
+							{
+								buildVersion = build;
+								if(_incrementBuild)
+								{
+									_log.Trace("Incrementing Build");
+									buildVersion = build + 1;
+								}
+							}
+							break;
+						case 3:
+							if (int.TryParse(splitVersion[i], out int revision))
+							{
+								revisionVersion = revision;
+								if(_incrementRevision)
+								{
+									_log.Trace("Incrementing Revision");
+									revisionVersion = revision + 1;
+								}
+							}
 							break;
 					}
 				}
 			}
 			
-			var newVersion = $"{majorVersion}.{minorVersion}.{buildVersion}.{revision}";
+			var newVersion = $"{majorVersion}.{minorVersion}.{buildVersion}.{revisionVersion}";
 			_log.Trace($"New Build number is: {newVersion}");
 			return newVersion;	
-			
 		}
 
 
 		private int GetBuildVersion()
 		{
-			var now = DateTime.Now;
 			var then = new DateTime(2000, 1, 1);
-
-			return (int)(now - then).TotalDays;
+			return (int)((DateTime.Today - then).TotalDays);
 		}
 
 		private int GetBuildRevision()
