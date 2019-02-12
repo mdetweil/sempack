@@ -54,16 +54,18 @@ namespace sempacklib
 			_processStartInfo.RedirectStandardInput = true;
 			_processStartInfo.RedirectStandardError = true;
 			_processStartInfo.UseShellExecute = false;
-			_processStartInfo.Arguments = $"-c \"{_commandArg}\"";
+			
 
 			if(OperatingSystem.IsWindows())
 			{
 				_log.Trace("Running process from cmd.exe");
+				_processStartInfo.Arguments = $"/c {_commandArg}";
 				_processStartInfo.FileName = "cmd.exe";
 			}
 			else 
 			{
 				_log.Trace("Running process from bash");
+				_processStartInfo.Arguments = $"-c \"{_commandArg}\"";
 				_processStartInfo.FileName = "/bin/bash";
 			}
 		}

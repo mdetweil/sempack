@@ -31,20 +31,24 @@ namespace sempacklib
 		{
 			var doc = XElement.Load(_projPath);
 			var propertyGroup = doc.Element("PropertyGroup");
-			var versionElement = propertyGroup.Element("Version");
-			var version = versionElement?.Value;
+			
+			//If Version Element Exists, delete it
+			propertyGroup.Element("Version")?.Remove();
+
+			//Update or create Version Prefix Element
+			var versionPrefixElement = propertyGroup.Element("VersionPrefix");
+			var version = versionPrefixElement?.Value;
 			var newVersionNumber = CreateNewBuildNumber(version);
 
-			if (versionElement is null)
+			if (versionPrefixElement is null)
 			{
 				_log.Trace($"Adding New Version Attribute");
-				propertyGroup.Add(new XElement("Version", newVersionNumber));
+				propertyGroup.Add(new XElement("VersionPrefix", newVersionNumber));
 			}
 			else 
 			{
-				versionElement.SetValue(newVersionNumber);			
+				versionPrefixElement.SetValue(newVersionNumber);			
 			}
-
 
 			var sb = new StringBuilder();
 			var settings = new XmlWriterSettings();
@@ -60,82 +64,76 @@ namespace sempacklib
 
 		private string CreateNewBuildNumber(string currentVersion = null)
 		{
-			var majorVersion = 1;
-			var minorVersion = 0;
-			var buildVersion = GetBuildVersion();
-			var revisionVersion = GetBuildRevision();
+			var splitVersion = new string[4];
+
 			if (!string.IsNullOrEmpty(currentVersion))
 			{
 				_log.Trace($"Current Version Value is: {currentVersion}");
-				var splitVersion = currentVersion.Split('.');
-				
-				for(int i = 0; i < splitVersion.Length; i++)
-				{
-					switch(i)
-					{
-						case 0:
-							if (int.TryParse(splitVersion[i], out int major))
-							{
-								majorVersion = major;
-								if(_incrementMajor)
-								{
-									_log.Trace("Incrementing Major");
-									majorVersion = major + 1;
-								}
-							}
-
-							break;
-						case 1:
-							if (int.TryParse(splitVersion[i], out int minor))
-							{
-								minorVersion = minor;
-								if(_incrementMinor)
-								{
-									_log.Trace("Incrementing Minor");
-									minorVersion = minor + 1;
-								}
-							}
-							break;
-						case 2:
-							if (int.TryParse(splitVersion[i], out int build))
-							{
-								buildVersion = build;
-								if(_incrementBuild)
-								{
-									_log.Trace("Incrementing Build");
-									buildVersion = build + 1;
-								}
-							}
-							break;
-						case 3:
-							if (int.TryParse(splitVersion[i], out int revision))
-							{
-								revisionVersion = revision;
-								if(_incrementRevision)
-								{
-									_log.Trace("Incrementing Revision");
-									revisionVersion = revision + 1;
-								}
-							}
-							break;
-					}
-				}
+				splitVersion = currentVersion.Split('.');		
 			}
-			
+			var majorVersion = GetMajorVersion(splitVersion);
+			var minorVersion = GetMinorVersion(splitVersion);
+			var buildVersion = GetBuildVersion(splitVersion);
+			var revisionVersion = GetBuildRevision(splitVersion);
+
 			var newVersion = $"{majorVersion}.{minorVersion}.{buildVersion}.{revisionVersion}";
 			_log.Trace($"New Build number is: {newVersion}");
-			return newVersion;	
+			return newVersion;
 		}
 
-
-		private int GetBuildVersion()
+		private int GetMajorVersion(string[] splitVersion)
 		{
+			if(!string.IsNullOrEmpty(splitVersion[0]) &&
+				int.TryParse(splitVersion[0], out int majorVers))
+			{
+				if(_incrementMajor)
+				{
+					return majorVers + 1;
+				}
+				return majorVers;
+			}			
+			return 1;
+		}
+
+		private int GetMinorVersion(string[] splitVersion)
+		{
+			if(!string.IsNullOrEmpty(splitVersion[1]) &&
+				int.TryParse(splitVersion[1], out int minorVers))
+			{
+				if(_incrementMinor)
+				{
+					return minorVers + 1;
+				}
+				return minorVers;
+			}			
+			return 0;
+			
+		}
+
+		private int GetBuildVersion(string[] splitVersion)
+		{
+			if(_incrementBuild)
+			{
+				if(!string.IsNullOrEmpty(splitVersion[2]) &&
+					int.TryParse(splitVersion[2], out int build))
+				{
+					return build + 1;
+				}
+			}
 			var then = new DateTime(2000, 1, 1);
 			return (int)((DateTime.Today - then).TotalDays);
 		}
 
-		private int GetBuildRevision()
+		private int GetBuildRevision(string[] splitVersion)
 		{
+			if(_incrementRevision)
+			{
+				if(!string.IsNullOrEmpty(splitVersion[3]) &&
+					int.TryParse(splitVersion[3], out int revision))
+				{
+					return revision + 1;
+				}
+			}
 			var sinceMidnight = DateTime.Now - DateTime.Today;
 		    return (int)sinceMidnight.TotalSeconds / 2;
 		}
