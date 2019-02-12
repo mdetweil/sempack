@@ -10,7 +10,7 @@ Updates the Version property of the .csproj file
 Use the command line with the following command:
 
 ```bash
-dotnet tool install --global sempack --version 1.0.6981.37323
+dotnet tool install --global sempack
 ```
 
 ## Usage
