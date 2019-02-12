@@ -33,7 +33,7 @@ namespace sempacklib
 			var propertyGroup = doc.Element("PropertyGroup");
 			
 			//If Version Element Exists, delete it
-			propertyGroup.Element("Version").Remove();
+			propertyGroup.Element("Version")?.Remove();
 
 			//Update or create Version Prefix Element
 			var versionPrefixElement = propertyGroup.Element("VersionPrefix");
@@ -43,7 +43,7 @@ namespace sempacklib
 			if (versionPrefixElement is null)
 			{
 				_log.Trace($"Adding New Version Attribute");
-				propertyGroup.Add(new XElement("Version", newVersionNumber));
+				propertyGroup.Add(new XElement("VersionPrefix", newVersionNumber));
 			}
 			else 
 			{
@@ -64,30 +64,27 @@ namespace sempacklib
 
 		private string CreateNewBuildNumber(string currentVersion = null)
 		{
+			var splitVersion = new string[4];
 
 			if (!string.IsNullOrEmpty(currentVersion))
 			{
 				_log.Trace($"Current Version Value is: {currentVersion}");
-				var splitVersion = currentVersion.Split('.');
-
-				var majorVersion = GetMajorVersion(splitVersion);
-				var minorVersion = GetMajorVersion(splitVersion);
-				var buildVersion = GetBuildVersion(splitVersion);
-				var revisionVersion = GetBuildRevision(splitVersion);
-
-				var newVersion = $"{majorVersion}.{minorVersion}.{buildVersion}.{revisionVersion}";
-				_log.Trace($"New Build number is: {newVersion}");
-				return newVersion;
+				splitVersion = currentVersion.Split('.');		
 			}
-			_log.Trace("Current Version is Null or Empty, setting version to 1.0.0.0");
-			return "1.0.0.0";
+			var majorVersion = GetMajorVersion(splitVersion);
+			var minorVersion = GetMinorVersion(splitVersion);
+			var buildVersion = GetBuildVersion(splitVersion);
+			var revisionVersion = GetBuildRevision(splitVersion);
+
+			var newVersion = $"{majorVersion}.{minorVersion}.{buildVersion}.{revisionVersion}";
+			_log.Trace($"New Build number is: {newVersion}");
+			return newVersion;
 		}
 
 		private int GetMajorVersion(string[] splitVersion)
 		{
-			var major = splitVersion[0];
-			if(!string.IsNullOrEmpty(major) &&
-				int.TryParse(major, out int majorVers))
+			if(!string.IsNullOrEmpty(splitVersion[0]) &&
+				int.TryParse(splitVersion[0], out int majorVers))
 			{
 				if(_incrementMajor)
 				{
@@ -100,9 +97,8 @@ namespace sempacklib
 
 		private int GetMinorVersion(string[] splitVersion)
 		{
-			var minor = splitVersion[1];
-			if(!string.IsNullOrEmpty(minor) &&
-				int.TryParse(minor, out int minorVers))
+			if(!string.IsNullOrEmpty(splitVersion[1]) &&
+				int.TryParse(splitVersion[1], out int minorVers))
 			{
 				if(_incrementMinor)
 				{
