@@ -59,7 +59,7 @@ namespace sempacklib
 			if(OperatingSystem.IsWindows())
 			{
 				_log.Trace("Running process from cmd.exe");
-				_processStartInfo.Arguments = $"\"{_commandArg}\"";
+				_processStartInfo.Arguments = $"/c {_commandArg}";
 				_processStartInfo.FileName = "cmd.exe";
 			}
 			else 
