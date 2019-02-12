@@ -10,7 +10,7 @@ Updates the Version property of the .csproj file
 Use the command line with the following command:
 
 ```bash
-dotnet tool install --global sempack --version 0.2.0 
+dotnet tool install --global sempack --version 1.0.6981.37323
 ```
 
 ## Usage
@@ -21,6 +21,8 @@ sempack -f foo/foo.csproj --major --minor --build-version --revision
 ## `sempack` Commands
 
 `<Version>{MAJOR}.{MINOR}.{BUILD-VERSION}.{REVISION}</Version>` 
+
+`f` or `source-file` - the csproj file to pack
 
 `major` - increments the major version by one
 
