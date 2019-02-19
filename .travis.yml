@@ -1,7 +1,9 @@
 language: csharp
 solution: sempack.sln
 mono: none
-dotnet: 2.2.103
+dotnet: 2.2
+sudo: required
+dist: xenial
 script:
   - dotnet restore
   - dotnet test
