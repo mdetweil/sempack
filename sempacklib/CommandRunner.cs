@@ -26,7 +26,7 @@ namespace sempacklib
 			BuildProcess();
 		}
 
-		public bool TryRunCommand(out string result)
+		public bool TryRunCommand()
 		{
 			_log.Trace($"Running Command {_commandArg}");
 			_process.Start();
@@ -36,8 +36,6 @@ namespace sempacklib
 			_process.CancelOutputRead();
 			_process.CancelErrorRead();
 
-			result = _processOutput.ToString();
-			
 			if (_process.ExitCode == 0)
 			{
 				return true;
@@ -80,7 +78,7 @@ namespace sempacklib
 			(
 				delegate(object sender, DataReceivedEventArgs args)
 				{
-					_processOutput.Append(args.Data);
+					_log.Trace(args.Data);
 				}
 			);
 
@@ -88,7 +86,7 @@ namespace sempacklib
 			(
 				delegate(object sender, DataReceivedEventArgs args)
 				{
-					_processOutput.Append(args.Data);
+					_log.Trace(args.Data);
 				}
 			);
 		}

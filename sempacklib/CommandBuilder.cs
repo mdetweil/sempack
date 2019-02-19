@@ -58,6 +58,7 @@ namespace sempacklib
 		{
 			_log.Trace("Building pass through command string.");
 			
+			SetVerbosity();
 			SetProjectFile();
 			SetConfiguration();
 			SetIncludeSource();
@@ -71,8 +72,26 @@ namespace sempacklib
 			return _command.ToString();
 		}
 
+		private void SetVerbosity()
+		{
+			_log.Trace("Adding Verbosity Level");
+			if (_options.VerbosityLevel > 0)
+			{
+				string level = _options.VerbosityLevel.ToString();
+				if (level.Length == 1)
+				{
+					level = $"{_options.VerbosityLevel - 1}";
+				}
+				_command.Append($"--verbosity {level.ToLower()}");
+			}
+		}
+
 		private void SetProjectFile()
 		{
+			if (_command.Length > 0)
+			{
+				_command.Append(" ");
+			}
 			_command.Append($"{_options.SourceFile}");
 		}
 

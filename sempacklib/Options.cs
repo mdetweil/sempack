@@ -7,10 +7,15 @@ namespace sempacklib
 {
 	public class Options
 	{
-        [Option('v', "verbose", 
-        	Required = false, 
-        	HelpText = "Set output to verbose messages.")]
-        public bool Verbose { get; set; }
+        //[Option('v', "verbose", 
+       // 	Required = false, 
+       // 	HelpText = "Set output to verbose messages.")]
+        //public bool Verbose { get; set; }
+
+        [Option('v', "verbosity",
+        	Required = false,
+        	HelpText = "Set output verbosity Level")]
+        public VerbosityLevel VerbosityLevel {get; set;}
 
         [Option('c', "configuration", 
         	Required = false, 
