@@ -4,7 +4,12 @@ sempack is a dotnet core cli tool to help version and pack nupkgs.
 
 Updates the Version property of the .csproj file
 
+## Status
 
+ Build  |  Status
+ -------|--------
+develop | [![Build Status](https://travis-ci.com/mdetweil/sempack.svg?branch=develop)](https://travis-ci.com/mdetweil/sempack)
+ master | [![Build Status](https://travis-ci.com/mdetweil/sempack.svg?branch=master)](https://travis-ci.com/mdetweil/sempack)
 ## Installation
 
 Use the command line with the following command:
