@@ -5,6 +5,7 @@ using NLog.Config;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 
 
@@ -16,16 +17,19 @@ namespace sempacklib
     	private static Logger _log;
     	private const string _command = "dotnet pack";
 
-    	public SempackLibrary(string[] args)
+    	public SempackLibrary(IEnumerable<string> args)
     	{
-    		_args = args;
-    		ParseArguments();
+    		_args = args.ToArray();
     	}
 
-    	private void ParseArguments()
+    	public void ParseArguments()
     	{
-    		var results = Parser.Default.ParseArguments<Options>(_args);
-    		if (results.Tag == ParserResultType.Parsed)
+            var parser = new Parser(cfg => cfg.CaseInsensitiveEnumValues = true);
+            var results = parser.ParseArguments<Options>(_args);
+
+            //var results = Parser.Default.ParseArguments<Options>(_args);
+    		
+            if (results.Tag == ParserResultType.Parsed)
     		{
 	    		results.WithParsed<Options>((opts) => RunOptionsAndReturnExitCode(opts));        
 	    	}
@@ -66,11 +70,11 @@ namespace sempacklib
 
     	private void RunOptionsAndReturnExitCode(Options options)
     	{
-    		BuildLoggingConfiguration(options.Verbose);
+    		BuildLoggingConfiguration(options.VerbosityLevel > 0);
     		_log.Trace("Handling Valid Options");
     		var builder = new CommandBuilder(options);
-    		
-    		string result = string.Empty;
+
+            string result = string.Empty;
 
     		if(!builder.TryBuildCommandString(out result))
     		{
@@ -87,16 +91,14 @@ namespace sempacklib
 
     		var runner = new CommandRunner(_command, result);
     		
-    		if(!runner.TryRunCommand(out result))
+    		if(!runner.TryRunCommand())
     		{
-    			_log.Error($"COMMAND FAILED: {result}");	
+    			_log.Error($"COMMAND FAILED");	
     		}
     		else 
     		{
-    			_log.Trace($"Successful Command: {result}");
+    			_log.Trace($"COMMAND SUCCESSFUL");
     		}
     	}
-
-
     }
 }

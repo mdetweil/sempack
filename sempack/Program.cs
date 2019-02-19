@@ -8,7 +8,7 @@ namespace sempack
         static void Main(string[] args)
         {
             var sempack = new SempackLibrary(args);
-           
+           	sempack.ParseArguments();
         }
     }
 }
