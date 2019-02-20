@@ -1,5 +1,5 @@
 ﻿using System;
-using sempacklib;
+
 
 namespace sempack
 {
@@ -7,8 +7,8 @@ namespace sempack
     {
         static void Main(string[] args)
         {
-            var sempack = new SempackLibrary(args);
-           	sempack.ParseArguments();
+    		  var application = new Application(args);
+    		  application.Run();	
         }
     }
 }
