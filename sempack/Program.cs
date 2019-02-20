@@ -7,8 +7,8 @@ namespace sempack
     {
         static void Main(string[] args)
         {
-    		var application = new Application(args);
-    		application.Run();	
+    		  var application = new Application(args);
+    		  application.Run();	
         }
     }
 }

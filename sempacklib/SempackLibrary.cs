@@ -16,9 +16,7 @@ namespace sempacklib
     	private string[] _args;
     	private static Logger _log;
     	private const string _command = "dotnet pack";
-
-        public event EventHandler<CommandCompletedArgs> CommandCompleted; 
-
+      public event EventHandler<CommandCompletedArgs> CommandCompleted; 
     	public SempackLibrary(IEnumerable<string> args)
     	{
     		_args = args.ToArray();
@@ -95,17 +93,17 @@ namespace sempacklib
 
     		var runner = new CommandRunner(_command, result);
     		
-            var handler = CommandCompleted;
+        var handler = CommandCompleted;
 
     		if(!runner.TryRunCommand())
     		{
-    			_log.Error($"COMMAND FAILED");
-                handler(this, new CommandCompletedArgs(false));
-    		}
+    		  _log.Error($"COMMAND FAILED");
+          handler(this, new CommandCompletedArgs(false));
+        }
     		else 
     		{
     			_log.Trace($"COMMAND SUCCESSFUL");
-                handler(this, new CommandCompletedArgs(true));
+          handler(this, new CommandCompletedArgs(true));
     		}
     	}
     }
