@@ -1,5 +1,5 @@
 ﻿using System;
-
+using Microsoft.Extensions.DependencyInjection;
 
 namespace sempack
 {
@@ -7,8 +7,9 @@ namespace sempack
     {
         static void Main(string[] args)
         {
-    		  var application = new Application(args);
-    		  application.Run();	
+            IServiceCollection serviceCollection = new ServiceCollection();
+    		var application = new Application(serviceCollection, args);
+    		application.Run();	
         }
     }
 }
