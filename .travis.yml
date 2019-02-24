@@ -4,8 +4,22 @@ mono: none
 dotnet: 2.2
 sudo: required
 dist: xenial
-before_script:
-  - dotnet restore
-  - dotnet test
-script:
-  - dotnet build
+jobs:
+  include:
+  - stage: restore
+    script: dotnet restore
+  - stage: build
+    script: dotnet build
+  - stage: test
+    script: dotnet testt
+  - stage: merge
+    if: branch = develop
+    script: "curl -o /tmp/travis-automerge https://raw.githubusercontent.com/cdown/travis-automerge/master/travis-automerge"
+    script: "chmod a+x /tmp/travis-automerge"
+    script: "BRANCHES_TO_MERGE_REGEX='.*' BRANCH_TO_MERGE_INTO=develop GITHUB_REPO=mdetweil/sempack /tmp/travis-automerge"
+  - stage: deploy
+    if: branch = master
+    script: dotnet pack sempack.csproj
+env:
+  global:
+    secure: Jprcs6eEy1zpqc7F65LOo5H+QiGX223nLhsn3cfJkTU+VQ5/HOoVTlfUGBIlH7AX0XoFBnkC4Rql4rWUb8v4Ktr1O4ArP/fhyvAPijZSRyquZ1Rv+A/chaq5HhQBu9KchgOIGdW4GzF4gaJU2oEd4TSFPaqFO2p4ir68p7NuF2sUQWUnxK8qWAffqTseFiqSdbtP5pVveXJFWQcQlYF8xd8ckYG2aFwrNS3w8h45M6RnyBCzqqQiIFTlgoqMUcD3kh7dYZDXCJp13neQNU555ktl0OvwPFOeoToWevGFYsdUDlbWm82yCXvErOn8miavoZSnn+Eu+yRZ9ZA7w3nDhEO4p3jPloVqQI4bzP7ir8ah+HDkKlYRsEgB+tUMyY5VspAyY0RwBUtQ4iItbA1OnsNAtFGOHdDbR1cOt6kZ7FyYl3dFiT/nVZ9N4SMXy9rw8dpKvMjsh+5xPq4FGEh/rXYfYKpSsCgDoLuctMe/3k+aNFG0cdSYuznLt9W0eSnvQlK9uMOhmvh90MP8UK8RygQHeL6Gm6KnG+TZP9QrB8JRSYCI6urqwRncizTtx7qml3WjVay7J6u0Us30qvm2eDIVuzhB2D96xAjEeBY7UbFoq0naRWyjPTWly9gTaR8//vO+Dx4CLlDu4kThrD8gH/AlKHp1ykvyVKOAZe4AxC0=
