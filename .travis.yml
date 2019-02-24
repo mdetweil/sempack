@@ -13,7 +13,7 @@ jobs:
   - stage: test
     script: dotnet testt
   - stage: merge
-    if: branch = develop
+    if: branch != master
     script: "curl -o /tmp/travis-automerge https://raw.githubusercontent.com/cdown/travis-automerge/master/travis-automerge"
     script: "chmod a+x /tmp/travis-automerge"
     script: "BRANCHES_TO_MERGE_REGEX='.*' BRANCH_TO_MERGE_INTO=develop GITHUB_REPO=mdetweil/sempack /tmp/travis-automerge"
