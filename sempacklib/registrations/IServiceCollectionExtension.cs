@@ -1,6 +1,7 @@
 using CommandLine;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Diagnostics;
 
 namespace sempacklib
 {
@@ -15,6 +16,8 @@ namespace sempacklib
              cfg.CaseInsensitiveEnumValues = true;
              cfg.HelpWriter = Console.Error;
             }));
+            services.AddTransient<Process>(s => new Process());
+            services.AddTransient<ProcessStartInfo>(s => new ProcessStartInfo());
             services.AddTransient<CommandRunner>();
 
             return services;

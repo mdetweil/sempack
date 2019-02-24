@@ -1,6 +1,5 @@
 ﻿using CommandLine;
 using Microsoft.Extensions.Logging;
-using NLog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,12 +13,22 @@ namespace sempacklib
     {
     	private readonly ILogger<SempackLibrary> _log;
 			private CommandLine.Parser _parser;
-    	private const string _command = "dotnet pack";
+			private CommandBuilder _builder;
+			private CsProjModifier _csProjModifier;
+    	private CommandRunner _commandRunner;
       public event EventHandler<CommandCompletedArgs> CommandCompleted; 
-    	public SempackLibrary(ILogger<SempackLibrary> logger, CommandLine.Parser parser)
+    	public SempackLibrary(
+				ILogger<SempackLibrary> logger, 
+				CommandLine.Parser parser, 
+				CommandBuilder builder,
+				CsProjModifier csProjModifier,
+				CommandRunner runner)
     	{
     		 _log = logger;
 				 _parser = parser;
+				 _builder = builder;
+				 _csProjModifier = csProjModifier;
+				 _commandRunner = runner;
     	}
 
     	public bool TryParseArguments(IEnumerable<string> args, out ParserResult<Options> results)
@@ -39,26 +48,22 @@ namespace sempacklib
     	public void RunOptionsAndReturnExitCode(Options options)
     	{
     		_log.LogTrace("Handling Valid Options");
-    		var builder = new CommandBuilder(options);
 
-            string result = string.Empty;
+        string result = string.Empty;
 
-    		if(!builder.TryBuildCommandString(out result))
+    		if(!_builder.TryBuildCommandString(options, out result))
     		{
     			_log.LogError($"Invalid Arguments: {result}");
     			return;
     		}
 
-    		var projModifier = new CsProjModifier(builder.GetPath(), options);
-    		if(!projModifier.TryModifyProjectFile())
+    		if(!_csProjModifier.TryModifyProjectFile(options, _builder.GetPath()))
     		{
     			_log.LogError($"Failed to modify {options.SourceFile} exiting application");
     			return;
     		}
 
-    		var runner = new CommandRunner(_command, result);
-
-    		if(!runner.TryRunCommand())
+    		if(!_commandRunner.TryRunCommand(result))
     		{
     		  _log.LogError($"COMMAND FAILED");
           CommandCompleted(this, new CommandCompletedArgs(false));

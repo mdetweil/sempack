@@ -1,4 +1,4 @@
-using NLog;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
 using System.Text;
@@ -8,27 +8,31 @@ namespace sempacklib
 {
 	public class CommandRunner
 	{
-		private Logger _log;
+		private ILogger<CommandRunner> _log;
 		private string _commandArg;
 
 		private ProcessStartInfo _processStartInfo;
 		private StringBuilder _processOutput;
 		private Process _process;
+		private const string COMMAND = "dotnet pack";
 
-
-		public CommandRunner(string command, string arg)
+		public CommandRunner(ILogger<CommandRunner> log, ProcessStartInfo startInfo, Process process)
 		{
-			_commandArg = $"{command} {arg}";
-			_log = LogManager.GetCurrentClassLogger();
+			
+			_log = log;
 			_processOutput = new StringBuilder();
-
-			BuildProcessStartInfo();
-			BuildProcess();
+			_processStartInfo = startInfo;
+			_process = process;
 		}
 
-		public bool TryRunCommand()
+		public bool TryRunCommand(string arg)
 		{
-			_log.Trace($"Running Command {_commandArg}");
+			_commandArg = $"{COMMAND} {arg}";
+			_log.LogTrace($"Running Command {_commandArg}");
+			
+			BuildProcessStartInfo();
+			BuildProcess();
+			
 			_process.Start();
 			_process.BeginOutputReadLine();
 			_process.BeginErrorReadLine();
@@ -45,8 +49,7 @@ namespace sempacklib
 
 		private void BuildProcessStartInfo()
 		{
-			_log.Trace("Building Process Start Info");
-			_processStartInfo = new ProcessStartInfo();
+			_log.LogTrace("Building Process Start Info");
 			_processStartInfo.CreateNoWindow = true;
 			_processStartInfo.RedirectStandardOutput = true;
 			_processStartInfo.RedirectStandardInput = true;
@@ -56,13 +59,13 @@ namespace sempacklib
 
 			if(OperatingSystem.IsWindows())
 			{
-				_log.Trace("Running process from cmd.exe");
+				_log.LogTrace("Running process from cmd.exe");
 				_processStartInfo.Arguments = $"/c {_commandArg}";
 				_processStartInfo.FileName = "cmd.exe";
 			}
 			else 
 			{
-				_log.Trace("Running process from bash");
+				_log.LogTrace("Running process from bash");
 				_processStartInfo.Arguments = $"-c \"{_commandArg}\"";
 				_processStartInfo.FileName = "/bin/bash";
 			}
@@ -70,15 +73,14 @@ namespace sempacklib
 
 		private void BuildProcess()
 		{
-			_log.Trace("Building Process");
-			_process = new Process();
+			_log.LogTrace("Building Process");
 			_process.StartInfo = _processStartInfo;
 			_process.EnableRaisingEvents = true;
 			_process.OutputDataReceived += new DataReceivedEventHandler
 			(
 				delegate(object sender, DataReceivedEventArgs args)
 				{
-					_log.Trace(args.Data);
+					_log.LogTrace(args.Data);
 				}
 			);
 
@@ -86,7 +88,7 @@ namespace sempacklib
 			(
 				delegate(object sender, DataReceivedEventArgs args)
 				{
-					_log.Trace(args.Data);
+					_log.LogTrace(args.Data);
 				}
 			);
 		}
