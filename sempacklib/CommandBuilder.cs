@@ -1,4 +1,4 @@
-using NLog;
+using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Text;
@@ -7,24 +7,22 @@ namespace sempacklib
 {
 	public class CommandBuilder
 	{
-		private readonly Logger _log;
-		private readonly Options _options;
+		private readonly ILogger<CommandBuilder> _log;
 		private StringBuilder _command;
 		private string _path;
 
-		public CommandBuilder(Options options)
+		public CommandBuilder(ILogger<CommandBuilder> log)
 		{
-			_options = options;
-			_log = LogManager.GetCurrentClassLogger();
+			_log = log;
 			_command = new StringBuilder();
 		}
 
-		public bool TryBuildCommandString(out string result)
+		public bool TryBuildCommandString(Options options, out string result)
 		{
 			string failedResult;
-			if(ValidateArgs(out failedResult))
+			if(ValidateArgs(options, out failedResult))
 			{
-				result = BuildPassThroughCommandString();
+				result = BuildPassThroughCommandString(options);
 				return true;
 			}
 			else
@@ -39,163 +37,162 @@ namespace sempacklib
 			return _path;
 		}
 
-		private bool ValidateArgs(out string result)
+		private bool ValidateArgs(Options options, out string result)
 		{
 			result = string.Empty;
 			var currentDirectory = Directory.GetCurrentDirectory();
-			_path = Path.Combine(currentDirectory, _options.SourceFile);
+			_path = Path.Combine(currentDirectory, options.SourceFile);
 
 			if (File.Exists(_path))
 			{
 				result = _path;
 				return true;
 			}
-			result = $"Unable to locate project file: {_options.SourceFile}";
+			result = $"Unable to locate project file: {options.SourceFile}";
 			return false;
 		}
 
-		private string BuildPassThroughCommandString()
+		private string BuildPassThroughCommandString(Options options)
 		{
-			_log.Trace("Building pass through command string.");
+			_log.LogTrace("Building pass through command string.");
 			
-			SetVerbosity();
-			SetProjectFile();
-			SetConfiguration();
-			SetIncludeSource();
-			SetIncludeSymbols();
-			SetNoRestore();
-			SetOutputDirectory();
-			SetRuntime();
-			SetServiceable();
-			SetVersionSuffix();
+			SetVerbosity(options.VerbosityLevel);
+			SetProjectFile(options.SourceFile);
+			SetConfiguration(options.Configuration);
+			SetIncludeSource(options.IncludeSource);
+			SetIncludeSymbols(options.IncludeSymbols);
+			SetNoRestore(options.NoRestore);
+			SetOutputDirectory(options.OutputDirectory);
+			SetRuntime(options.Runtime);
+			SetServiceable(options.Serviceable);
+			SetVersionSuffix(options.VersionSuffix);
 
 			return _command.ToString();
 		}
 
-		private void SetVerbosity()
+		private void SetVerbosity(VerbosityLevel level)
 		{
-			_log.Trace("Adding Verbosity Level");
-			if (_options.VerbosityLevel > 0)
+			_log.LogTrace("Adding Verbosity Level");
+			if (level > 0)
 			{
-				string level = _options.VerbosityLevel.ToString();
-				if (level.Length == 1)
+				if (level.ToString().Length == 1)
 				{
-					level = $"{_options.VerbosityLevel - 1}";
+					level = level - 1;
 				}
-				_command.Append($"--verbosity {level.ToLower()}");
+				_command.Append($"--verbosity {level.ToString().ToLower()}");
 			}
 		}
 
-		private void SetProjectFile()
+		private void SetProjectFile(string sourceFile)
 		{
 			if (_command.Length > 0)
 			{
 				_command.Append(" ");
 			}
-			_command.Append($"{_options.SourceFile}");
+			_command.Append($"{sourceFile}");
 		}
 
-		private void SetConfiguration()
+		private void SetConfiguration(string configuration)
 		{
-			if (!string.IsNullOrEmpty(_options.Configuration))
+			if (!string.IsNullOrEmpty(configuration))
 			{
-				_log.Trace($"Adding Configuration Option {_options.Configuration}.");
-				_command.Append($" -c {_options.Configuration}");
+				_log.LogTrace($"Adding Configuration Option {configuration}.");
+				_command.Append($" -c {configuration}");
 			}
 			else 
 			{
-				_log.Trace($"Configuration option not set, using default value.");	
+				_log.LogTrace($"Configuration option not set, using default value.");	
 			}
 		}
 
-		private void SetIncludeSource()
+		private void SetIncludeSource(bool source)
 		{
-			if(_options.IncludeSource)
+			if(source)
 			{
-				_log.Trace($"Adding Include Source option");
+				_log.LogTrace($"Adding Include Source option");
 				_command.Append($" --include-source");
 			}
 			else 
 			{
-				_log.Trace($"Include Source option not set");
+				_log.LogTrace($"Include Source option not set");
 			}
 		}
 
-		private void SetIncludeSymbols()
+		private void SetIncludeSymbols(bool symbols)
 		{
-			if(_options.IncludeSymbols)
+			if(symbols)
 			{
-				_log.Trace($"Adding Include Symbols option");
+				_log.LogTrace($"Adding Include Symbols option");
 				_command.Append($" --include-symbols");
 			}
 			else 
 			{
-				_log.Trace($"Include Symbols option not set");
+				_log.LogTrace($"Include Symbols option not set");
 			}
 		}
 
-		private void SetNoRestore()
+		private void SetNoRestore(bool noRestore)
 		{
-			if(_options.NoRestore)
+			if(noRestore)
 			{
-				_log.Trace($"Adding No Restore option");
+				_log.LogTrace($"Adding No Restore option");
 				_command.Append($" --no-restore");
 			}
 			else 
 			{
-				_log.Trace($"No Restore option not set");
+				_log.LogTrace($"No Restore option not set");
 			}
 		}
 
-		private void SetOutputDirectory()
+		private void SetOutputDirectory(string outputDir)
 		{
-			if(!string.IsNullOrEmpty(_options.OutputDirectory))
+			if(!string.IsNullOrEmpty(outputDir))
 			{
-				_log.Trace($"Setting Output Directory to {_options.OutputDirectory}");
-				_command.Append($" -o {_options.OutputDirectory}");
+				_log.LogTrace($"Setting Output Directory to {outputDir}");
+				_command.Append($" -o {outputDir}");
 			}
 			else 
 			{
-				_log.Trace($"No Output Directory to include in command");
+				_log.LogTrace($"No Output Directory to include in command");
 			}
 		}
 
-		private void SetRuntime()
+		private void SetRuntime(string runtime)
 		{
-			if(!string.IsNullOrEmpty(_options.Runtime))
+			if(!string.IsNullOrEmpty(runtime))
 			{
-				_log.Trace($"Setting Runtime to {_options.Runtime}");
-				_command.Append($" --runtime {_options.Runtime}");
+				_log.LogTrace($"Setting Runtime to {runtime}");
+				_command.Append($" --runtime {runtime}");
 			}
 			else 
 			{
-				_log.Trace($"No Runtime to include in command");
+				_log.LogTrace($"No Runtime to include in command");
 			}
 		}
 
-		private void SetServiceable()
+		private void SetServiceable(bool serviceable)
 		{
-			if(_options.Serviceable)
+			if(serviceable)
 			{
-				_log.Trace($"Adding Serviceable option");
+				_log.LogTrace($"Adding Serviceable option");
 				_command.Append($" -s");
 			}
 			else 
 			{
-				_log.Trace($"Serviceable option not set");
+				_log.LogTrace($"Serviceable option not set");
 			}
 		}
 
-		private void SetVersionSuffix()
+		private void SetVersionSuffix(string versionSuffix)
 		{
-			if(!string.IsNullOrEmpty(_options.VersionSuffix))
+			if(!string.IsNullOrEmpty(versionSuffix))
 			{
-				_log.Trace($"Setting Version Suffix to {_options.VersionSuffix}");
-				_command.Append($" --version-suffix {_options.VersionSuffix}");
+				_log.LogTrace($"Setting Version Suffix to {versionSuffix}");
+				_command.Append($" --version-suffix {versionSuffix}");
 			}
 			else 
 			{
-				_log.Trace($"No Version Suffix to include in command");	
+				_log.LogTrace($"No Version Suffix to include in command");	
 			}
 		}
 	}

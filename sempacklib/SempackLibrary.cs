@@ -1,7 +1,5 @@
 ﻿using CommandLine;
-using NLog;
-using NLog.Targets;
-using NLog.Config;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,99 +9,69 @@ using System.Text;
 
 namespace sempacklib
 {
-    public class SempackLibrary
+    public class SempackLibrary : ISempackLibrary
     {
-    	private string[] _args;
-    	private static Logger _log;
-    	private const string _command = "dotnet pack";
+    	private readonly ILogger<SempackLibrary> _log;
+			private CommandLine.Parser _parser;
+			private CommandBuilder _builder;
+			private CsProjModifier _csProjModifier;
+    	private CommandRunner _commandRunner;
       public event EventHandler<CommandCompletedArgs> CommandCompleted; 
-    	public SempackLibrary(IEnumerable<string> args)
+    	public SempackLibrary(
+				ILogger<SempackLibrary> logger, 
+				CommandLine.Parser parser, 
+				CommandBuilder builder,
+				CsProjModifier csProjModifier,
+				CommandRunner runner)
     	{
-    		_args = args.ToArray();
+    		 _log = logger;
+				 _parser = parser;
+				 _builder = builder;
+				 _csProjModifier = csProjModifier;
+				 _commandRunner = runner;
     	}
 
-    	public void ParseArguments()
+    	public bool TryParseArguments(IEnumerable<string> args, out ParserResult<Options> results)
     	{
-            var parser = new Parser(cfg => cfg.CaseInsensitiveEnumValues = true);
-            var results = parser.ParseArguments<Options>(_args);
+				_log.LogTrace("Trying to parse Options");
+				results = _parser.ParseArguments<Options>(args);
 
-            //var results = Parser.Default.ParseArguments<Options>(_args);
-    		
-            if (results.Tag == ParserResultType.Parsed)
+				return results.Tag == ParserResultType.Parsed;
+    	}
+
+			public void ReportParseErrors(IEnumerable<CommandLine.Error> errors)
+			{
+				//Will display the Help screen
+				return;
+			}
+    
+    	public void RunOptionsAndReturnExitCode(Options options)
+    	{
+    		_log.LogTrace("Handling Valid Options");
+
+        string result = string.Empty;
+
+    		if(!_builder.TryBuildCommandString(options, out result))
     		{
-	    		results.WithParsed<Options>((opts) => RunOptionsAndReturnExitCode(opts));        
-	    	}
-    	}
-
-    	private void BuildLoggingConfiguration(bool verbose)
-    	{
-        	var config = new LoggingConfiguration();
-        	var layoutString = string.Empty;
-        	if(verbose)
-        	{
-        		layoutString = @"${date:format=HH\:mm\:ss} VERBOSE ${message} ${exception}";
-        	}
-        	else 
-        	{
-        		layoutString = @"${date:format=HH\:mm\:ss} ${level} ${message} ${exception}";
-        	}
-
-	        var consoleTarget = new ConsoleTarget("target1")
-	        {
-	            Layout = layoutString
-	        };
-	        config.AddTarget(consoleTarget);
-
-	        if(verbose)
-	        {
-	        	config.AddRuleForAllLevels(consoleTarget); // only errors to file
-	        }
-	        else 
-	        {
-	        	config.AddRuleForOneLevel(LogLevel.Error, consoleTarget); // only errors to file
-	        }
-
-    	    LogManager.Configuration = config;
-    	    _log = LogManager.GetCurrentClassLogger();
-    	    _log.Trace("VERBOSE Logging Enabled");
-    	}
-
-
-
-    	private void RunOptionsAndReturnExitCode(Options options)
-    	{
-    		BuildLoggingConfiguration(options.VerbosityLevel > 0);
-    		_log.Trace("Handling Valid Options");
-    		var builder = new CommandBuilder(options);
-
-            string result = string.Empty;
-
-    		if(!builder.TryBuildCommandString(out result))
-    		{
-    			_log.Error($"Invalid Arguments: {result}");
+    			_log.LogError($"Invalid Arguments: {result}");
     			return;
     		}
 
-    		var projModifier = new CsProjModifier(builder.GetPath(), options);
-    		if(!projModifier.TryModifyProjectFile())
+    		if(!_csProjModifier.TryModifyProjectFile(options, _builder.GetPath()))
     		{
-    			_log.Error($"Failed to modify {options.SourceFile} exiting application");
+    			_log.LogError($"Failed to modify {options.SourceFile} exiting application");
     			return;
     		}
 
-    		var runner = new CommandRunner(_command, result);
-    		
-        var handler = CommandCompleted;
-
-    		if(!runner.TryRunCommand())
+    		if(!_commandRunner.TryRunCommand(result))
     		{
-    		  _log.Error($"COMMAND FAILED");
-          handler(this, new CommandCompletedArgs(false));
+    		  _log.LogError($"COMMAND FAILED");
+          CommandCompleted(this, new CommandCompletedArgs(false));
         }
     		else 
     		{
-    			_log.Trace($"COMMAND SUCCESSFUL");
-          handler(this, new CommandCompletedArgs(true));
+    			_log.LogTrace($"COMMAND SUCCESSFUL");
+          CommandCompleted(this, new CommandCompletedArgs(true));
     		}
     	}
     }
