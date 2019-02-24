@@ -1,6 +1,7 @@
 using NLog;
+using sempacklib;
 
-namespace sempacklib
+namespace sempack
 {
     public static class VerbosityToNlogConverter
     {
@@ -19,7 +20,7 @@ namespace sempacklib
                     return LogLevel.Info;
                 case VerbosityLevel.D:
                 case VerbosityLevel.Detailed:
-                    return LogLevel.Debug;
+                    return LogLevel.Trace;
                 default:
                     return LogLevel.Trace;
             }

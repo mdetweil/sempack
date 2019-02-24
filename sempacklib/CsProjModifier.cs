@@ -1,4 +1,4 @@
-using NLog;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Text;
@@ -7,29 +7,24 @@ using System.Xml.Linq;
 
 namespace sempacklib
 {
-
 	public class CsProjModifier
 	{
-		private readonly string _projPath;
-		private readonly Logger _log;
+		private readonly ILogger<CsProjModifier> _log;
 		private bool _incrementMajor;
 		private bool _incrementMinor;
 		private bool _incrementBuild;
 		private bool _incrementRevision;
 
-		public CsProjModifier(string projPath, Options options)
+		public CsProjModifier(ILogger<CsProjModifier> log)
 		{
-			_projPath = projPath;
-			_log = LogManager.GetCurrentClassLogger();
-			_incrementMajor = options.Major;
-			_incrementMinor = options.Minor;
-			_incrementBuild = options.Build;
-			_incrementRevision = options.Revision;
+			_log = log;
 		}
 
-		public bool TryModifyProjectFile()
+		public bool TryModifyProjectFile(Options options, string projPath)
 		{
-			var doc = XElement.Load(_projPath);
+			SetOptions(options);
+
+			var doc = XElement.Load(projPath);
 			var propertyGroup = doc.Element("PropertyGroup");
 			
 			//If Version Element Exists, delete it
@@ -42,7 +37,7 @@ namespace sempacklib
 
 			if (versionPrefixElement is null)
 			{
-				_log.Trace($"Adding New Version Attribute");
+				_log.LogTrace($"Adding New Version Attribute");
 				propertyGroup.Add(new XElement("VersionPrefix", newVersionNumber));
 			}
 			else 
@@ -50,16 +45,23 @@ namespace sempacklib
 				versionPrefixElement.SetValue(newVersionNumber);			
 			}
 
-			var sb = new StringBuilder();
 			var settings = new XmlWriterSettings();
 			settings.OmitXmlDeclaration = true;
 			settings.Indent = true;
 
-			using (var writer = XmlWriter.Create(_projPath, settings))
+			using (var writer = XmlWriter.Create(projPath, settings))
 			{
 				doc.Save(writer);
 			}
 			return true;
+		}
+
+		private void SetOptions(Options options)
+		{
+			_incrementMajor = options.Major;
+			_incrementMinor = options.Minor;
+			_incrementBuild = options.Build;
+			_incrementRevision = options.Revision;
 		}
 
 		private string CreateNewBuildNumber(string currentVersion = null)
@@ -68,7 +70,7 @@ namespace sempacklib
 
 			if (!string.IsNullOrEmpty(currentVersion))
 			{
-				_log.Trace($"Current Version Value is: {currentVersion}");
+				_log.LogTrace($"Current Version Value is: {currentVersion}");
 				splitVersion = currentVersion.Split('.');		
 			}
 			var majorVersion = GetMajorVersion(splitVersion);
@@ -77,7 +79,7 @@ namespace sempacklib
 			var revisionVersion = GetBuildRevision(splitVersion);
 
 			var newVersion = $"{majorVersion}.{minorVersion}.{buildVersion}.{revisionVersion}";
-			_log.Trace($"New Build number is: {newVersion}");
+			_log.LogTrace($"New Build number is: {newVersion}");
 			return newVersion;
 		}
 
