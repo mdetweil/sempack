@@ -18,9 +18,9 @@ git checkout "$1"
 printf 'Merging %s\n' "$TRAVIS_COMMIT" >&2
 git merge --ff-only "$TRAVIS_COMMIT"
 
-printf 'Pushing to %s\n' "$GITHUB_REPO" >&2
+printf 'Pushing to %s\n' "mdetweil/sempack" >&2
 
-push_uri="https://$GITHUB_SECRET_TOKEN@github.com/$GITHUB_REPO"
+push_uri="https://$GITHUB_SECRET_TOKEN@github.com/mdetweil/sempack"
 
 # Redirect to /dev/null to avoid secret leakage
 #git push "$push_uri" "$1" >/dev/null 2>&1
