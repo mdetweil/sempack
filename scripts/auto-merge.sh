@@ -16,7 +16,11 @@ printf 'Checking out %s\n' "$1" >&2
 git checkout "$1"
 
 printf 'Merging %s\n' "$TRAVIS_COMMIT" >&2
-git merge --ff-only "$TRAVIS_COMMIT"
+if [ "$1" == "develop" ]; then
+    git merge --ff-only "$TRAVIS_COMMIT"
+else
+    git merge "$TRAVIS_COMMIT"
+fi
 
 printf 'Pushing to %s\n' "mdetweil/sempack" >&2
 

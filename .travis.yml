@@ -8,10 +8,8 @@ before_script:
 - chmod -R a+x scripts
 jobs:
   include:
-  - stage: build and test
-    script: dotnet restore
-    script: dotnet build
-    script: dotnet test
+  - stage: restore, build, test
+    script: dotnet restore && dotnet build && dotnet test
   - stage: merge into develop
     if: branch != master AND branch != develop
     script: "./scripts/auto-merge.sh develop"
