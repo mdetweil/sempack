@@ -5,7 +5,20 @@ dotnet: 2.2
 sudo: required
 dist: xenial
 before_script:
-  - dotnet restore
-  - dotnet test
-script:
-  - dotnet build
+- chmod -R a+x scripts
+jobs:
+  include:
+  - stage: restore, build, test
+    script: dotnet restore && dotnet build && dotnet test
+  - stage: merge into develop
+    if: branch != master AND branch != develop
+    script: "./scripts/auto-merge.sh develop"
+  - stage: merge into master
+    if: branch = develop
+    script: "./scripts/auto-merge.sh master"
+  - stage: deploy
+    if: branch = master
+    script: dotnet pack sempack.csproj
+env:
+  global:
+  - secure: UJ5kzioake7OGlHZ7H7vTClGLPXpgCg+G6bICzrBXSN6bIowRK7iTcLfmgppqjbD8/BmNj53l9eN4VcqcJEQ8zqrPb3tUy35KONw6y9LV7slNyQxgT3GiTOHcuh4yxh3+mUYTQVQdwW35RMC8xJA0opJPPy8DDU/gqIQhOt0n61FefPjBOlXVd+tQ2Owe/HZaTIF+Sj1icPGm0bIBv49tpuRQzwZOBfTDmVZRncMV8qyQU1tHgw309vU+1LhapEUQ6kLi1Ib1mrmv35gQW2WR9pc0spgwSrVzfQSwKkEL1u+GWvSg4ol7sXSh1udVlLrZDS7R+wjkhp3lx5tWNoUaUsk9FVBZOHj7yhJ+nNE9OmogjH/Y0Xm6CIWmGPke7jAiz1Jl1BRLxwvqlDX5Gj1Ade2j3VVuvAYntORxlBg5vc2AABR5FcCQtnLwGu2AHx7YxdQOcaZWPYw73MRDiALRsBijCflbos0SV2DEup5ecpqR0fAmwNixZLiCHWsIuAG5yPvGuSsSuuhyexz330uR7l/dM2batsLynq9KNa9jpI+YnLzahbW0ReN2SULDoIRUcBkqDnqKOlsV8T1kWdqlp3lCV9KENQ2rus56xgy5qVrsRCtxFmlEycGg2WaSa7rwpZmUA1gj2j9nCb3It2ySOj80Zdk0xdINTMqo0yBj5Y=
