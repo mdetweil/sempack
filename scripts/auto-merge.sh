@@ -20,10 +20,11 @@ git merge --ff-only "$TRAVIS_COMMIT"
 
 printf 'Pushing to %s\n' "mdetweil/sempack" >&2
 
-push_uri="https://$GITHUB_SECRET_TOKEN@github.com/mdetweil/sempack"
+push_uri="https://$TOKEN@github.com/mdetweil/sempack"
 
 # Redirect to /dev/null to avoid secret leakage
 #git push "$push_uri" "$1" >/dev/null 2>&1
+printf 'Pushing to %s\n' "$push_uri" >&2
 git push "$push_uri" "$1" 
 
 #git push "$push_uri" :"$TRAVIS_BRANCH" >/dev/null 2>&1
