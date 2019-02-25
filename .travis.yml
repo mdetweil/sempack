@@ -6,13 +6,15 @@ sudo: required
 dist: xenial
 jobs:
   include:
-  - stage: build
-    script: dotnet restore
-    script: dotnet build
-  - stage: test
-    script: dotnet test
+  #- stage: build
+  #  script: dotnet restore
+  #  script: dotnet build
+  #- stage: test
+  #  script: dotnet test
   - stage: "merge into develop"
     if: "branch != master AND branch != develop"
+    script: $PWD
+    script: ls -l
     script: "./merge.sh develop"
   - stage: "merge into master"
     if: "branch = develop"
