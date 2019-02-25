@@ -13,7 +13,7 @@ git clone "https://github.com/mdetweil/sempack" "$repo_temp"
 cd "$repo_temp"
 
 printf 'Checking out %s\n' "$1" >&2
-git checkout "$BRANCH_TO_MERGE_INTO"
+git checkout "$1"
 
 printf 'Merging %s\n' "$TRAVIS_COMMIT" >&2
 git merge --ff-only "$TRAVIS_COMMIT"
@@ -24,7 +24,7 @@ push_uri="https://$GITHUB_SECRET_TOKEN@github.com/$GITHUB_REPO"
 
 # Redirect to /dev/null to avoid secret leakage
 #git push "$push_uri" "$1" >/dev/null 2>&1
-#git push "$push_uri" "$1" 
+git push "$push_uri" "$1" 
 
 #git push "$push_uri" :"$TRAVIS_BRANCH" >/dev/null 2>&1
 git push "$push_uri" :"$TRAVIS_BRANCH" 
