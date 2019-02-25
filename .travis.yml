@@ -6,12 +6,11 @@ sudo: required
 dist: xenial
 jobs:
   include:
-  - stage: restore
-    script: dotnet restore
   - stage: build
+    script: dotnet restore
     script: dotnet build
   - stage: test
-    script: dotnet testt
+    script: dotnet test
   - stage: merge
     if: branch != master
     script: "curl -o /tmp/travis-automerge https://raw.githubusercontent.com/cdown/travis-automerge/master/travis-automerge"
