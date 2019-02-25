@@ -13,8 +13,8 @@ jobs:
   #  script: dotnet test
   - stage: "merge into develop"
     if: "branch != master AND branch != develop"
-    script: $PWD
-    script: ls -l
+    script: "$PWD"
+    script: "ls -l"
     script: "./merge.sh develop"
   - stage: "merge into master"
     if: "branch = develop"
