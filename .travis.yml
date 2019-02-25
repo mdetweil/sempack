@@ -11,11 +11,12 @@ jobs:
     script: dotnet build
   - stage: test
     script: dotnet test
-  - stage: merge
-    if: branch != master
-    script: "curl -o /tmp/travis-automerge https://raw.githubusercontent.com/cdown/travis-automerge/master/travis-automerge"
-    script: "chmod a+x /tmp/travis-automerge"
-    script: "BRANCHES_TO_MERGE_REGEX='.*' BRANCH_TO_MERGE_INTO=develop GITHUB_REPO=mdetweil/sempack /tmp/travis-automerge"
+  - stage: "merge into develop"
+    if: "branch != master AND branch != develop"
+    script: "./merge.sh develop"
+  - stage: "merge into master"
+    if: "branch = develop"
+    script: "./merge.sh master"
   - stage: deploy
     if: branch = master
     script: dotnet pack sempack.csproj
