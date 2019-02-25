@@ -13,11 +13,7 @@ jobs:
   #  script: dotnet test
   - stage: "merge into develop"
     if: "branch != master AND branch != develop"
-    script: "$PWD"
-    script: "ls -l"
-    script: "cd mdetweil/sempack/"
-    script: "sudo chmod +x merge.sh"
-    script: "sudo ./merge.sh develop"
+    script: "./scripts/merge.sh develop"
   - stage: "merge into master"
     if: "branch = develop"
     script: "./merge.sh master"
