@@ -7,4 +7,4 @@ git fetch
 git reset --hard
 git checkout $1
 git merge --ff-only "$TRAVIS_COMMIT"
-git push https://${GITHUB_SECRET_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git $1
+git push https://$GITHUB_SECRET_TOKEN@github.com/${TRAVIS_REPO_SLUG}.git $1
