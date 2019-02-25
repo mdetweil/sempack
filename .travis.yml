@@ -4,6 +4,9 @@ mono: none
 dotnet: 2.2
 sudo: required
 dist: xenial
+before_script:
+  - chmod -r a+x scripts
+
 jobs:
   include:
   #- stage: build
