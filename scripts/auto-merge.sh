@@ -16,16 +16,17 @@ printf 'Checking out %s\n' "$1" >&2
 git checkout "$1"
 
 printf 'Merging %s\n' "$TRAVIS_COMMIT" >&2
-if [ "$1" == "develop" ]; then
-    git merge --ff-only "$TRAVIS_COMMIT"
-else
-    git merge "$TRAVIS_COMMIT"
-fi
+git merge "$TRAVIS_COMMIT"
 
 printf 'Pushing to %s\n' "mdetweil/sempack" >&2
 
 push_uri="https://$TOKEN@github.com/mdetweil/sempack"
 
 # Redirect to /dev/null to avoid secret leakage
-git push "$push_uri" "$1" >/dev/null 2>&1
-git push "$push_uri" :"$TRAVIS_BRANCH" >/dev/null 2>&1
+if [ "$1" == "develop" ]; then
+    git push "$push_uri" "$1" >/dev/null 2>&1
+    git push "$push_uri" :"$TRAVIS_BRANCH" >/dev/null 2>&1
+else
+    git push "$push_uri" "$1" >/dev/null 2>&1
+fi
+
