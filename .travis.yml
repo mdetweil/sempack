@@ -16,10 +16,10 @@ jobs:
   #  script: dotnet test
   - stage: "merge into develop"
     if: "branch != master AND branch != develop"
-    script: "./scripts/auto-merge.s develop"
+    script: "./scripts/auto-merge.sh develop"
   - stage: "merge into master"
     if: "branch = develop"
-    script: "../scripts/auto-merge.s develop"
+    script: "../scripts/auto-merge.sh develop"
   - stage: deploy
     if: branch = master
     script: dotnet pack sempack.csproj
