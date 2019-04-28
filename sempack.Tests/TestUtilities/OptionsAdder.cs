@@ -1,6 +1,6 @@
 ﻿using sempacklib;
 
-namespace sempack.Tests
+namespace sempack.Tests.TestUtilities
 {
     public static class OptionsAdder
     {

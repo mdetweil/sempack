@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using sempack.Tests.TestUtilities;
 using sempacklib;
 
 namespace sempack.Tests

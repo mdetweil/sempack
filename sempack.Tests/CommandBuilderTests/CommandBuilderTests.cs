@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
+using sempack.Tests.TestUtilities;
 using sempacklib;
 using System;
 using System.IO;
