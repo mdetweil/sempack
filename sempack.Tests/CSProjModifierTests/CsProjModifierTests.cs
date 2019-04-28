@@ -10,16 +10,13 @@ using Xunit;
 
 namespace sempack.Tests.CSProjModifierTests
 {
-    public class CsProjModifierTests: IDisposable
+    public class CsProjModifierTests
     {
         private readonly CsProjModifier _csProjModifier;
-        private readonly string _path;
         public CsProjModifierTests()
         {
             var logger = new Mock<ILogger<CsProjModifier>>();
             _csProjModifier = new CsProjModifier(logger.Object);
-            var directory = Directory.GetCurrentDirectory();
-            _path = Path.Combine(directory, "Test.csproj");
         }
 
         [Theory]
@@ -35,12 +32,16 @@ namespace sempack.Tests.CSProjModifierTests
                 Build = input.IncrementBuild,
                 Revision = input.IncrementRevision
             };
-            WriteFileContents(input.PresetPrefixVersion, input.DeleteVersion, input.DeleteVersionPrefix);
+            var directory = Directory.GetCurrentDirectory();
+            var guid = Guid.NewGuid().ToString();
+            var path = Path.Combine(directory, $"{guid}.csproj");
+
+            WriteFileContents(path, input.PresetPrefixVersion, input.DeleteVersion, input.DeleteVersionPrefix);
 
             //Act
-            var result = _csProjModifier.TryModifyProjectFile(options, _path);
+            var result = _csProjModifier.TryModifyProjectFile(options, path);
 
-            var doc = XElement.Load(_path);
+            var doc = XElement.Load(path);
             var propertyGroup = doc.Element("PropertyGroup");
             var versionPrefix = propertyGroup.Element("VersionPrefix");
             var splitVersion = versionPrefix.Value.Split('.');
@@ -56,53 +57,49 @@ namespace sempack.Tests.CSProjModifierTests
             Assert.Equal(input.ExpectedMajorVersion, splitVersion[0]);
             Assert.Equal(input.ExpectedMinorVersion, splitVersion[1]);
 
+            Dispose(path);
         }
 
-        public void Dispose()
+        public void Dispose(string path)
         {
-            if (!File.Exists(_path))
+            if (!File.Exists(path))
             {
-                File.Delete(_path);
+                File.Delete(path);
             }
         }
 
-        private void WriteFileContents(string presetVersion, bool removeVersion, bool removeVersionPrefix)
+        private void WriteFileContents(string path, string presetVersion, bool removeVersion, bool removeVersionPrefix)
         {
-            if (!File.Exists(_path))
+            using (var stream = File.Create(path))
             {
-                File.Create(_path);
+                string fileContents =
+                    "<Project Sdk=\"Microsoft.NET.Sdk\">  <PropertyGroup>	<Version></Version>	<VersionPrefix></VersionPrefix>  </PropertyGroup></Project>";
+                var doc = XElement.Parse(fileContents);
+
+                if (removeVersion)
+                {
+                    doc.Element("PropertyGroup").Element("Version").Remove();
+                }
+
+                if (removeVersionPrefix)
+                {
+                    doc.Element("PropertyGroup").Element("VersionPrefix").Remove();
+                }
+                else
+                {
+                    doc.Element("PropertyGroup").Element("VersionPrefix").SetValue(presetVersion);
+                }
+
+                var settings = new XmlWriterSettings();
+                settings.OmitXmlDeclaration = true;
+                settings.Indent = true;
+
+                using (var writer = XmlWriter.Create(stream, settings))
+                {
+                    doc.WriteTo(writer);
+                    writer.Dispose();
+                }
             }
-
-            string fileContents =
-                "<Project Sdk=\"Microsoft.NET.Sdk\">  <PropertyGroup>	<Version></Version>	<VersionPrefix></VersionPrefix>  </PropertyGroup></Project>";
-            var doc = XElement.Parse(fileContents);
-
-            if (removeVersion)
-            {
-                doc.Element("PropertyGroup").Element("Version").Remove();
-            }
-
-            if (removeVersionPrefix)
-            {
-                doc.Element("PropertyGroup").Element("VersionPrefix").Remove();
-            }
-            else
-            {
-                doc.Element("PropertyGroup").Element("VersionPrefix").SetValue(presetVersion);
-            }
-
-            var settings = new XmlWriterSettings();
-            settings.OmitXmlDeclaration = true;
-            settings.Indent = true;
-
-            Thread.Sleep(1000);
-
-            using (var writer = XmlWriter.Create(_path, settings))
-            {
-                doc.Save(writer);
-            }
-
-            Thread.Sleep(1000);
         }
     }
 }
