@@ -19,7 +19,7 @@ develop | [![Build Status](https://travis-ci.com/mdetweil/sempack.svg?branch=dev
 Use the command line with the following command:
 
 ```bash
-dotnet tool install --global sempack
+dotnet tool install --global sempack --version 1.1.7057.22950
 ```
 
 ## Usage
