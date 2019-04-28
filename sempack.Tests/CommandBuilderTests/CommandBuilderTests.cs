@@ -28,8 +28,13 @@ namespace sempack.Tests
         [MemberData("GetBuildCommandTestCaseTitles", MemberType = typeof(CommandBuilderTestCases))]
         public void TryBuildCommandString_ReturnsProperResults(string name)
         {
+            //Arrange
             var input = CommandBuilderTestCases.GetBuildCommandTestCase(name);
+
+            //Act
             var result = _commandBuilder.TryBuildCommandString(input.Options, out var actual);
+
+            //Assert
             Assert.Equal(input.Result, result);
             Assert.Equal(input.ResponseString, actual);
         }

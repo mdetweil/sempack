@@ -56,13 +56,36 @@ namespace sempack.Tests.CSProjModifierTests
             Assert.NotNull(splitVersion[3]);
             Assert.Equal(input.ExpectedMajorVersion, splitVersion[0]);
             Assert.Equal(input.ExpectedMinorVersion, splitVersion[1]);
+            if (input.IncrementBuild)
+            {
+                var version = input.PresetPrefixVersion.Split('.')[2];
+                var parsed = int.Parse(version);
+                Assert.Equal((parsed + 1).ToString(), splitVersion[2]);
+            }
+            else
+            {
+                var then = new DateTime(2000, 1, 1);
+                Assert.True(int.Parse(splitVersion[2]) > (int)((DateTime.Today - then).TotalDays) - 1);
+            }
+
+            if (input.IncrementRevision)
+            {
+                var version = input.PresetPrefixVersion.Split('.')[3];
+                var parsed = int.Parse(version);
+                Assert.Equal((parsed + 1).ToString(), splitVersion[3]);
+            }
+            else
+            {
+                var sinceMidnight = DateTime.Now - DateTime.Today;
+                Assert.True(int.Parse(splitVersion[3]) > ((int)sinceMidnight.TotalSeconds / 2) - 2);
+            }
 
             Dispose(path);
         }
 
         public void Dispose(string path)
         {
-            if (!File.Exists(path))
+            if (File.Exists(path))
             {
                 File.Delete(path);
             }
