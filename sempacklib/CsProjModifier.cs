@@ -27,15 +27,19 @@ namespace sempacklib
 			var doc = XElement.Load(projPath);
 			var propertyGroup = doc.Element("PropertyGroup");
 			
-			//If Version Element Exists, delete it
-			propertyGroup.Element("Version")?.Remove();
+			var versionElement = propertyGroup.Element("Version");
+            var versionPrefixElement = propertyGroup.Element("VersionPrefix");
+            
+            //There couple be a potential conflict with both the version and the version prefix being set
+            var version = GetPotentialSwapVersion(versionElement, versionPrefixElement);
 
-			//Update or create Version Prefix Element
-			var versionPrefixElement = propertyGroup.Element("VersionPrefix");
-			var version = versionPrefixElement?.Value;
-			var newVersionNumber = CreateNewBuildNumber(version);
+            //If Version Property is there, delete it
+            propertyGroup.Element("Version")?.Remove();
 
-			if (versionPrefixElement is null)
+            //Update or create Version Prefix Element
+            var newVersionNumber = CreateNewBuildNumber(version);
+
+            if (versionPrefixElement is null)
 			{
 				_log.LogTrace($"Adding New Version Attribute");
 				propertyGroup.Add(new XElement("VersionPrefix", newVersionNumber));
@@ -56,7 +60,7 @@ namespace sempacklib
 			return true;
 		}
 
-		private void SetOptions(Options options)
+        private void SetOptions(Options options)
 		{
 			_incrementMajor = options.Major;
 			_incrementMinor = options.Minor;
@@ -64,7 +68,27 @@ namespace sempacklib
 			_incrementRevision = options.Revision;
 		}
 
-		private string CreateNewBuildNumber(string currentVersion = null)
+        private string GetPotentialSwapVersion(XElement versionElement, XElement versionPrefixElement)
+        {
+            //Version Element doesn't exist, or has an empty value
+            if (versionElement is null || string.IsNullOrEmpty(versionElement.Value))
+            {
+                return versionPrefixElement?.Value;
+            }
+
+            //Prefix version is null or not set, but version is set, return version
+            if (versionPrefixElement is null || string.IsNullOrEmpty(versionPrefixElement.Value))
+            {
+                return versionElement.Value;
+            }
+
+            var splitVersion = versionElement.Value.Split('.');
+            var splitPrefixVersion = versionPrefixElement.Value.Split('.');
+
+            return VersionPicker(splitVersion, splitPrefixVersion);
+        }
+       
+        private string CreateNewBuildNumber(string currentVersion = null)
 		{
 			var splitVersion = new string[4];
 
@@ -139,5 +163,54 @@ namespace sempacklib
 			var sinceMidnight = DateTime.Now - DateTime.Today;
 		    return (int)sinceMidnight.TotalSeconds / 2;
 		}
-	}
+
+        private string VersionPicker(string[] splitVersion, string[] splitPrefixVersion)
+        {
+            var newVersion = new int[4];
+
+            var s1 = NormalizeArray(splitVersion);
+            var s2 = NormalizeArray(splitPrefixVersion);
+
+            for (int i = 0; i < newVersion.Length; i++)
+            {
+                var a = TryParseNullable(s1[i]);
+                var b = TryParseNullable(s2[i]);
+                var max = Nullable.Compare(a, b) > 0 ? a : b;
+
+                newVersion[i] = max ?? 0;
+            }
+
+            return string.Join(".", newVersion);
+        }
+
+        private string[] NormalizeArray(string[] arrayToCopy)
+        {
+            var arr = new string[4];
+
+            for (int i = 0; i < arrayToCopy.Length; i++)
+            {
+                arr[i] = arrayToCopy[i];
+            }
+
+            for (int i = 0; i < arr.Length; i++)
+            {
+                if (string.IsNullOrEmpty(arr[i]))
+                {
+                    arr[i] = "0";
+                }
+            }
+
+            return arr;
+        }
+
+        private int? TryParseNullable(string val = null)
+        {
+            if (val is null)
+            {
+                return null;
+            }
+            int outValue;
+            return int.TryParse(val, out outValue) ? (int?)outValue : null;
+        }
+    }
 }

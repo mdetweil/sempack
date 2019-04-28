@@ -5,6 +5,7 @@
         public bool DeleteVersion { get; set; }
         public bool DeleteVersionPrefix { get; set; }
         public string PresetPrefixVersion { get; set; } = "";
+        public string PresetVersion { get; set; } = "";
         public bool IncrementMajor { get; set; }
         public bool IncrementMinor { get; set; }
         public bool IncrementBuild { get; set; }

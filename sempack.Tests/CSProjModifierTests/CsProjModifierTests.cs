@@ -36,7 +36,7 @@ namespace sempack.Tests.CSProjModifierTests
             var guid = Guid.NewGuid().ToString();
             var path = Path.Combine(directory, $"{guid}.csproj");
 
-            WriteFileContents(path, input.PresetPrefixVersion, input.DeleteVersion, input.DeleteVersionPrefix);
+            WriteFileContents(path, input);
 
             //Act
             var result = _csProjModifier.TryModifyProjectFile(options, path);
@@ -91,7 +91,7 @@ namespace sempack.Tests.CSProjModifierTests
             }
         }
 
-        private void WriteFileContents(string path, string presetVersion, bool removeVersion, bool removeVersionPrefix)
+        private void WriteFileContents(string path, CsProjModifierTest input)
         {
             using (var stream = File.Create(path))
             {
@@ -99,18 +99,22 @@ namespace sempack.Tests.CSProjModifierTests
                     "<Project Sdk=\"Microsoft.NET.Sdk\">  <PropertyGroup>	<Version></Version>	<VersionPrefix></VersionPrefix>  </PropertyGroup></Project>";
                 var doc = XElement.Parse(fileContents);
 
-                if (removeVersion)
+                if (input.DeleteVersion)
                 {
                     doc.Element("PropertyGroup").Element("Version").Remove();
                 }
+                else
+                {
+                    doc.Element("PropertyGroup").Element("Version").SetValue(input.PresetVersion);
+                }
 
-                if (removeVersionPrefix)
+                if (input.DeleteVersionPrefix)
                 {
                     doc.Element("PropertyGroup").Element("VersionPrefix").Remove();
                 }
                 else
                 {
-                    doc.Element("PropertyGroup").Element("VersionPrefix").SetValue(presetVersion);
+                    doc.Element("PropertyGroup").Element("VersionPrefix").SetValue(input.PresetPrefixVersion);
                 }
 
                 var settings = new XmlWriterSettings();

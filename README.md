@@ -2,7 +2,11 @@
 
 sempack is a dotnet core cli tool to help version and pack nupkgs.
 
-Updates the Version property of the .csproj file
+Updates the VersionPrefix property of the .csproj file.
+
+If the Version property is set, Version will be carried over to VersionPrefix.
+
+If both VersionPrefix and Version properties are set, the highest value for each will be chosen.
 
 ## Status
 
@@ -27,17 +31,14 @@ sempack -f foo/foo.csproj --major --minor --build-version --revision
 
 `<Version>{MAJOR}.{MINOR}.{BUILD-VERSION}.{REVISION}</Version>` 
 
-`f` or `source-file` - the csproj file to pack
-
-`major` - increments the major version by one
-
-`minor` - increments the minor version by one
-
-`build-version` - increments the build version by one
-
-`revision` - increments the revision version by one
-
-`v` or `verbose` - will turn on verbose logging
+| Command | Description |
+| --- | --- |
+| `f` or `source-file` | the csproj file to pack |
+| `major` | increments the major version by one |
+| `minor` | increments the minor version by one |
+| `build-version` | increments the build version by one |
+| `revision` - increments the revision version by one |
+| `v` or `verbose` | will turn on verbose logging |
 
 
 ## `dotnet pack` Commands

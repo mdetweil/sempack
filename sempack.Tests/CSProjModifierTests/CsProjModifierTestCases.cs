@@ -30,14 +30,15 @@ namespace sempack.Tests.CSProjModifierTests
         private static void BuildTestCaseDictionary()
         {
             _cases = new Dictionary<string, CsProjModifierTest>();
-            _cases.Add("No Version or Version Prefix Successful Result", BuildNoVersionTestCase());
-            _cases.Add("With Version and No Version Prefix Successful Result", BuildVersionTestCase());
-            _cases.Add("Version Prefix not populated successful result", BuildVersionPrefixTestCase());
-            _cases.Add("Preset Version Prefix increment Major Version Successful Result", BuildIncrementMajorVersionPrefixTestCase());
-            _cases.Add("Preset Version Prefix increment Minor Version Successful Result", BuildIncrementMinorVersionPrefixTestCase());
-            _cases.Add("Preset Version Prefix increment Build Version Successful Result", BuildIncrementBuildVersionPrefixTestCase());
-            _cases.Add("Preset Version Prefix increment Revision Version Successful Result", BuildIncrementRevisionVersionPrefixTestCase());
-            _cases.Add("Preset Verions Prefix Increment All Successful Result", BuildIncrementAllVersionPrefixTestCase());
+            _cases.Add("No Version or Version Prefix Should Succeed", BuildNoVersionTestCase());
+            _cases.Add("With Version and No Version Prefix Should Succeed", BuildVersionTestCase());
+            _cases.Add("Version Prefix not populated Should Succeed", BuildVersionPrefixTestCase());
+            _cases.Add("Preset Version Prefix should increment Major Version", BuildIncrementMajorVersionPrefixTestCase());
+            _cases.Add("Preset Version Prefix should increment Minor Version", BuildIncrementMinorVersionPrefixTestCase());
+            _cases.Add("Preset Version Prefix should increment Build Version", BuildIncrementBuildVersionPrefixTestCase());
+            _cases.Add("Preset Version Prefix should increment Revision Version", BuildIncrementRevisionVersionPrefixTestCase());
+            _cases.Add("Preset Version Prefix should Increment All", BuildIncrementAllVersionPrefixTestCase());
+            _cases.Add("Version should override Version Prefix", BuildValidateVersionOverrideVersionPrefixTestCase());
         }
 
         private static CsProjModifierTest BuildNoVersionTestCase()
@@ -130,6 +131,18 @@ namespace sempack.Tests.CSProjModifierTests
                 IncrementMinor = true,
                 IncrementBuild = true,
                 IncrementRevision = true,
+                ExpectedMajorVersion = "2",
+                ExpectedMinorVersion = "2",
+                Result = true
+            };
+        }
+
+        private static CsProjModifierTest BuildValidateVersionOverrideVersionPrefixTestCase()
+        {
+            return new CsProjModifierTest()
+            {
+                PresetPrefixVersion = "1.1.1.1",
+                PresetVersion = "2.2.2.2",
                 ExpectedMajorVersion = "2",
                 ExpectedMinorVersion = "2",
                 Result = true
