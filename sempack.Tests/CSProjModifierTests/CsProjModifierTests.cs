@@ -101,6 +101,8 @@ namespace sempack.Tests.CSProjModifierTests
             {
                 doc.Save(writer);
             }
+
+            Thread.Sleep(1000);
         }
     }
 }
