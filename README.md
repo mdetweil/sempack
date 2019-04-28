@@ -33,12 +33,12 @@ sempack -f foo/foo.csproj --major --minor --build-version --revision
 
 | Command | Description |
 | --- | --- |
-| `f` or `source-file` | the csproj file to pack |
-| `major` | increments the major version by one |
-| `minor` | increments the minor version by one |
-| `build-version` | increments the build version by one |
-| `revision` - increments the revision version by one |
-| `v` or `verbose` | will turn on verbose logging |
+| `-f` or `--source-file` | the csproj file to pack |
+| `--major` | increments the major version by one |
+| `--minor` | increments the minor version by one |
+| `--build-version` | increments the build version by one |
+| `--revision` - increments the revision version by one |
+| `-v` or `--verbose` | will turn on verbose logging |
 
 
 ## `dotnet pack` Commands
