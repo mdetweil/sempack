@@ -3,6 +3,7 @@ using Moq;
 using sempacklib;
 using System;
 using System.IO;
+using System.Threading;
 using System.Xml;
 using System.Xml.Linq;
 using Xunit;
@@ -54,6 +55,7 @@ namespace sempack.Tests.CSProjModifierTests
             Assert.NotNull(splitVersion[3]);
             Assert.Equal(input.ExpectedMajorVersion, splitVersion[0]);
             Assert.Equal(input.ExpectedMinorVersion, splitVersion[1]);
+
         }
 
         public void Dispose()
@@ -92,6 +94,8 @@ namespace sempack.Tests.CSProjModifierTests
             var settings = new XmlWriterSettings();
             settings.OmitXmlDeclaration = true;
             settings.Indent = true;
+
+            Thread.Sleep(1000);
 
             using (var writer = XmlWriter.Create(_path, settings))
             {
