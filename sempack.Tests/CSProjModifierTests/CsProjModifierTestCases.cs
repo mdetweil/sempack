@@ -31,7 +31,7 @@ namespace sempack.Tests.CSProjModifierTests
         {
             _cases = new Dictionary<string, CsProjModifierTest>();
             _cases.Add("No Version or Version Prefix Successful Result", BuildNoVersionTestCase());
-            _cases.Add("With Version and No Version Prefix Successful Result", BuildNoVersionTestCase());
+            _cases.Add("With Version and No Version Prefix Successful Result", BuildVersionTestCase());
             _cases.Add("Version Prefix not populated successful result", BuildVersionPrefixTestCase());
             _cases.Add("Preset Version Prefix increment Major Version Successful Result", BuildIncrementMajorVersionPrefixTestCase());
             _cases.Add("Preset Version Prefix increment Minor Version Successful Result", BuildIncrementMinorVersionPrefixTestCase());
