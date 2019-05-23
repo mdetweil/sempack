@@ -6,7 +6,7 @@
     <PackageReference Include="CommandLineParser" Version="2.4.3" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
-    <PackageReference Include="Nlog" Version="4.5.11" />
+    <PackageReference Include="Nlog" Version="4.6.3" />
     <PackageReference Include="NLog.Extensions.Logging" Version="1.4.0" />
   </ItemGroup>
   <PropertyGroup>
