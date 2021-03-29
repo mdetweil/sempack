@@ -7,7 +7,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.9" />
     <PackageReference Include="Nlog" Version="4.7.9" />
-    <PackageReference Include="NLog.Extensions.Logging" Version="1.7.1" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="1.7.2" />
   </ItemGroup>
   <PropertyGroup>
     <OutputType>Exe</OutputType>
